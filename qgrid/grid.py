@@ -32,9 +32,13 @@ SLICK_GRID_CSS = template_contents('slickgrid.css.template')
 SLICK_GRID_JS = template_contents('slickgrid.js.template')
 
 
+def show_grid(data_frame, *args, **kwargs):
+    return SlickGrid(data_frame, *args, **kwargs)
+
+
 class SlickGrid(object):
 
-    def __init__(self, data_frame, remote_js=False):
+    def __init__(self, data_frame, remote_js=False, precision=None):
         self.data_frame = data_frame
         self.remote_js = remote_js
         self.div_id = str(uuid.uuid4())
@@ -60,7 +64,12 @@ class SlickGrid(object):
                     break
             self.column_types.append(column_type)
 
-        self.precision = pd.get_option('display.precision') - 1
+        if isinstance(precision, int) and precision>=0:
+            self.precision = precision
+        elif precision is None:
+            self.precision = pd.get_option('display.precision') - 1
+        else:
+            raise TypeError('precision')
 
     def _ipython_display_(self):
         try:
